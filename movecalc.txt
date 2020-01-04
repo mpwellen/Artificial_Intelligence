@@ -1,0 +1,135 @@
+//
+// Created by Michael on 4/29/2019.
+//
+
+#include "frac_heap.h"
+#include <stdio.h>
+#include <stdlib.h>
+/*
+ * init_heap():
+ * must be called once by the program using your
+ * functions before calls to any other functions are made. This
+ * allows you to set up any housekeeping needed for your memory
+ * allocator. For example, this is when you can initialize
+ * your free block list.
+ */
+
+static union block* list;
+static union block* curr;
+union block* test;
+union block* iterb;
+union block* iter;
+
+union block* dump;
+int numFree;
+typedef union block {
+    union block *next;
+    fraction frac;
+}union1;
+
+void init_heap(void)
+{
+    test=malloc(10*sizeof(union1));
+}
+
+/*
+ * new_frac():
+ * must return a pointer to fractions.
+ * It should be an item taken from the list of free blocks.
+ * (Don't forget to remove it from the list of free blocks!)
+ * If the free list is empty, you need to get more using malloc()
+ * (Number of blocks to malloc each time is specified in the project
+ * description)a
+ */
+fraction *new_frac()
+{
+    //If free list is empty, do the following
+    if(numFree==0)
+    {
+        //init_heap();
+        //numFree=10;
+        numFree=10;
+        int i=0;
+        //union1* ptr[10];
+        test=malloc(10*sizeof(union1));
+        //iter->next=test;
+        iter=test;
+        for(int i=0;i<9;i++)
+        {
+            test[i].next=&test[i+1];
+            //iter=iter->next;
+        }
+        test[9].next=NULL;
+        iter=test;
+        //iter->next=NULL;
+
+        printf("%s\n","Empty block created");
+    }
+    if(numFree==1)
+    {
+        numFree--;
+        return &(iter->frac);
+    }
+    numFree--;
+    iterb=iter;
+    iter=iter->next;
+    iterb->next=NULL;
+    //iter--;
+    //iter->next=NULL;
+    //printf("newFrac iterator: %p \n",iter);
+    return &(iterb->frac);
+}
+
+/*
+ * del_frac():
+ * takes a pointer to a fraction and adds that item to the free block list.
+ * The programmer using your functions promises to never use that item again,
+ * unless the item is given to her/him by a subsequent call to new_frac().
+ */
+void del_frac(fraction* node)
+{
+    printf("  Deleted Node: %p  ",node);
+    //test[numFree].next=node;
+    test=(union1 *)node;
+    test->next=iter;
+    iter=test;
+    numFree++;
+    //iter->next=(union1 *)node; //From Krishnakutty
+    //iter=(union1 *)node;
+    return;
+}
+
+/*
+ * dump_heap():
+ * For debugging/diagnostic purposes.
+ * It should print out the entire contents of the free list,
+ * printing out the address for each item.
+ */
+void dump_heap(void)
+{
+    printf("\n%s  ","Dump_Heap");
+    int i=0;
+    //printf("%p  ",&test);
+    printf("array address: %p  ",test);
+    printf("Iterator Place: %p\n ",iter);
+    dump=iter;
+    //int count=1;
+    int count=1;
+    //union1* curr=test;
+    i=1;
+    //while(i<10)
+    while(dump->next!=NULL)
+    {
+        //*iter=*iter->next;
+        //printf("\titer: %p  ",iter);
+        //printf("\tnext: %p\n",iter->next);
+        printf("\titer: %p ",dump);
+        count++;
+        i++;
+        dump=dump->next;
+    }
+    printf("\titer: %p ",dump);
+    printf("  count: %d numFree: %d\n",count,numFree);
+    //printf("%c ",ptr);
+    //Grab list, and go through it.
+}
